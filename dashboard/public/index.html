@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reddit Idea Miner - Dashboard</title>
+  <title>Reddit Idea Miner - B2C SaaS Ideas</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -19,25 +19,58 @@
       align-items: center;
       padding: 20px 0;
       border-bottom: 1px solid #333;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
     }
     h1 { color: #ff4500; font-size: 24px; }
     .stats {
       display: flex;
-      gap: 20px;
+      gap: 15px;
+      flex-wrap: wrap;
     }
     .stat {
       background: #1a1a1a;
-      padding: 10px 20px;
+      padding: 8px 16px;
       border-radius: 8px;
       text-align: center;
     }
-    .stat-value { font-size: 24px; font-weight: bold; color: #ff4500; }
-    .stat-label { font-size: 12px; color: #888; }
+    .stat-value { font-size: 20px; font-weight: bold; color: #ff4500; }
+    .stat-label { font-size: 11px; color: #888; }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .search-box {
+      flex: 1;
+      min-width: 200px;
+      padding: 10px 15px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      font-size: 14px;
+    }
+    .search-box:focus { outline: none; border-color: #ff4500; }
+
+    .sort-select {
+      padding: 10px 15px;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
     .filters {
       display: flex;
-      gap: 10px;
-      margin-bottom: 20px;
+      gap: 8px;
+      flex-wrap: wrap;
     }
     .filter-btn {
       padding: 8px 16px;
@@ -47,15 +80,17 @@
       border-radius: 20px;
       cursor: pointer;
       transition: all 0.2s;
+      font-size: 13px;
     }
     .filter-btn:hover, .filter-btn.active {
       background: #ff4500;
       border-color: #ff4500;
       color: white;
     }
+
     .ideas-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
       gap: 20px;
     }
     .idea-card {
@@ -64,17 +99,20 @@
       padding: 20px;
       border: 1px solid #333;
       transition: all 0.2s;
+      cursor: pointer;
     }
-    .idea-card:hover { border-color: #ff4500; }
-    .idea-card.approved { border-color: #22c55e; }
-    .idea-card.rejected { border-color: #ef4444; opacity: 0.6; }
+    .idea-card:hover { border-color: #ff4500; transform: translateY(-2px); }
+    .idea-card.approved { border-color: #22c55e; border-width: 2px; }
+    .idea-card.rejected { border-color: #ef4444; opacity: 0.5; }
+    .idea-card.shortlisted { border-color: #f59e0b; border-width: 2px; }
+
     .idea-header {
       display: flex;
       justify-content: space-between;
       align-items: flex-start;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
     }
-    .idea-name { font-size: 18px; font-weight: bold; color: #fff; }
+    .idea-name { font-size: 17px; font-weight: bold; color: #fff; }
     .idea-score {
       background: #ff4500;
       color: white;
@@ -82,65 +120,91 @@
       border-radius: 12px;
       font-size: 14px;
       font-weight: bold;
+      min-width: 45px;
+      text-align: center;
     }
+    .idea-score.high { background: #22c55e; }
+    .idea-score.medium { background: #f59e0b; }
+    .idea-score.low { background: #6b7280; }
+
     .idea-tagline {
       color: #aaa;
       font-style: italic;
-      margin-bottom: 15px;
+      margin-bottom: 12px;
+      font-size: 14px;
     }
     .idea-persona {
       background: #252525;
       padding: 10px;
       border-radius: 6px;
-      margin-bottom: 15px;
-      font-size: 14px;
+      margin-bottom: 12px;
+      font-size: 13px;
     }
     .idea-persona strong { color: #ff4500; }
+
+    .idea-cluster {
+      font-size: 11px;
+      color: #888;
+      margin-bottom: 10px;
+      padding: 4px 8px;
+      background: #252525;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
     .scores-row {
       display: flex;
-      gap: 15px;
-      margin-bottom: 15px;
+      gap: 10px;
+      margin-bottom: 12px;
     }
     .score-item {
       flex: 1;
       text-align: center;
       background: #252525;
-      padding: 8px;
+      padding: 6px;
       border-radius: 6px;
     }
-    .score-item .value { font-weight: bold; color: #ff4500; }
-    .score-item .label { font-size: 10px; color: #888; }
+    .score-item .value { font-weight: bold; color: #ff4500; font-size: 14px; }
+    .score-item .label { font-size: 9px; color: #888; text-transform: uppercase; }
+
     .idea-actions {
       display: flex;
-      gap: 10px;
-      margin-top: 15px;
+      gap: 8px;
+      margin-top: 12px;
     }
     .btn {
       flex: 1;
-      padding: 10px;
+      padding: 8px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
       font-weight: bold;
       transition: all 0.2s;
+      font-size: 12px;
     }
     .btn-approve { background: #22c55e; color: white; }
     .btn-approve:hover { background: #16a34a; }
+    .btn-shortlist { background: #f59e0b; color: black; }
+    .btn-shortlist:hover { background: #d97706; }
     .btn-reject { background: #ef4444; color: white; }
     .btn-reject:hover { background: #dc2626; }
     .btn-view { background: #3b82f6; color: white; }
     .btn-view:hover { background: #2563eb; }
+
     .status-badge {
       display: inline-block;
-      padding: 4px 8px;
+      padding: 3px 8px;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: 10px;
       font-weight: bold;
-      margin-left: 10px;
+      margin-left: 8px;
+      text-transform: uppercase;
     }
     .status-approved { background: #22c55e; color: white; }
     .status-rejected { background: #ef4444; color: white; }
-    .status-pending { background: #f59e0b; color: black; }
+    .status-pending { background: #6b7280; color: white; }
+    .status-shortlisted { background: #f59e0b; color: black; }
+
     .modal {
       display: none;
       position: fixed;
@@ -148,18 +212,18 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.8);
+      background: rgba(0,0,0,0.9);
       z-index: 1000;
       overflow-y: auto;
     }
-    .modal.active { display: flex; justify-content: center; align-items: flex-start; padding: 40px; }
+    .modal.active { display: flex; justify-content: center; align-items: flex-start; padding: 20px; }
     .modal-content {
       background: #1a1a1a;
       border-radius: 12px;
       padding: 30px;
-      max-width: 800px;
+      max-width: 900px;
       width: 100%;
-      max-height: 90vh;
+      max-height: 95vh;
       overflow-y: auto;
     }
     .modal-header {
@@ -167,55 +231,147 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 15px;
     }
+    .modal-header h2 { color: #fff; font-size: 24px; }
     .modal-close {
       background: none;
       border: none;
       color: #888;
-      font-size: 24px;
+      font-size: 28px;
       cursor: pointer;
     }
+    .modal-close:hover { color: #fff; }
+
+    .detail-section {
+      margin-bottom: 25px;
+    }
+    .detail-section h3 {
+      color: #ff4500;
+      margin-bottom: 10px;
+      font-size: 16px;
+      border-bottom: 1px solid #333;
+      padding-bottom: 5px;
+    }
+
     .evidence-item {
       background: #252525;
       padding: 15px;
       border-radius: 8px;
-      margin-bottom: 15px;
+      margin-bottom: 10px;
+      border-left: 3px solid #ff4500;
     }
-    .evidence-title { font-weight: bold; color: #ff4500; margin-bottom: 5px; }
-    .evidence-text { color: #ccc; font-size: 14px; }
+    .evidence-text { color: #ccc; font-size: 14px; line-height: 1.5; }
+
     .feature-list { list-style: none; }
     .feature-list li {
-      padding: 5px 0;
+      padding: 8px 0;
       border-bottom: 1px solid #333;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     .feature-list li:before {
-      content: "✓ ";
+      content: "✓";
       color: #22c55e;
+      font-weight: bold;
     }
+
+    .workflow-list {
+      counter-reset: workflow;
+      list-style: none;
+    }
+    .workflow-list li {
+      padding: 10px 0 10px 40px;
+      border-bottom: 1px solid #333;
+      position: relative;
+    }
+    .workflow-list li:before {
+      counter-increment: workflow;
+      content: counter(workflow);
+      position: absolute;
+      left: 0;
+      width: 28px;
+      height: 28px;
+      background: #ff4500;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
     textarea {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       border: 1px solid #333;
       border-radius: 6px;
       background: #252525;
       color: #e0e0e0;
       resize: vertical;
-      margin-top: 10px;
+      font-family: inherit;
+    }
+    textarea:focus { outline: none; border-color: #ff4500; }
+
+    .pricing-tag {
+      display: inline-block;
+      background: #22c55e;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #333;
+    }
+    .modal-actions .btn { padding: 12px 24px; font-size: 14px; }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+    }
+    .empty-state h3 { margin-bottom: 10px; color: #888; }
+
+    @media (max-width: 768px) {
+      .ideas-grid { grid-template-columns: 1fr; }
+      .controls { flex-direction: column; }
+      .search-box { width: 100%; }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>Reddit Idea Miner</h1>
+      <h1>Reddit Idea Miner - B2C SaaS</h1>
       <div class="stats" id="stats"></div>
     </header>
 
-    <div class="filters">
-      <button class="filter-btn active" data-filter="all">All Ideas</button>
-      <button class="filter-btn" data-filter="pending">Pending</button>
-      <button class="filter-btn" data-filter="approved">Approved</button>
-      <button class="filter-btn" data-filter="rejected">Rejected</button>
+    <div class="controls">
+      <input type="text" class="search-box" id="search" placeholder="Search ideas by name, target, or description...">
+      <select class="sort-select" id="sort">
+        <option value="score-desc">Highest Score</option>
+        <option value="score-asc">Lowest Score</option>
+        <option value="name-asc">Name A-Z</option>
+        <option value="name-desc">Name Z-A</option>
+        <option value="recent">Most Recent</option>
+      </select>
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">All (49)</button>
+        <button class="filter-btn" data-filter="pending">Pending</button>
+        <button class="filter-btn" data-filter="shortlisted">Shortlisted</button>
+        <button class="filter-btn" data-filter="approved">Approved</button>
+        <button class="filter-btn" data-filter="rejected">Rejected</button>
+      </div>
     </div>
 
     <div class="ideas-grid" id="ideas-grid"></div>
@@ -226,11 +382,10 @@
   </div>
 
   <script>
-    // API base - always use relative path (Vercel functions will proxy)
-    const API_BASE = '';
     let ideas = [];
     let currentFilter = 'all';
-
+    let currentSort = 'score-desc';
+    let searchQuery = '';
     let staticData = null;
 
     async function loadData() {
@@ -241,14 +396,27 @@
       return staticData;
     }
 
+    function getScoreClass(score) {
+      if (score >= 4) return 'high';
+      if (score >= 2.5) return 'medium';
+      return 'low';
+    }
+
+    function parseScores(idea) {
+      if (typeof idea.scores === 'string') {
+        try { return JSON.parse(idea.scores); } catch { return {}; }
+      }
+      return idea.scores || {};
+    }
+
     async function loadStats() {
       const data = await loadData();
       const stats = data.stats;
       document.getElementById('stats').innerHTML = `
         <div class="stat"><div class="stat-value">${stats.posts}</div><div class="stat-label">Posts</div></div>
         <div class="stat"><div class="stat-value">${stats.comments}</div><div class="stat-label">Comments</div></div>
-        <div class="stat"><div class="stat-value">${stats.subreddits || 0}</div><div class="stat-label">Subreddits</div></div>
         <div class="stat"><div class="stat-value">${stats.insights}</div><div class="stat-label">Insights</div></div>
+        <div class="stat"><div class="stat-value">${stats.clusters}</div><div class="stat-label">Clusters</div></div>
         <div class="stat"><div class="stat-value">${stats.ideas}</div><div class="stat-label">Ideas</div></div>
       `;
     }
@@ -258,50 +426,104 @@
       ideas = data.ideas;
       applyLocalStatuses();
       renderIdeas();
+      updateFilterCounts();
+    }
+
+    function updateFilterCounts() {
+      const statuses = loadLocalStatus();
+      const counts = { all: ideas.length, pending: 0, shortlisted: 0, approved: 0, rejected: 0 };
+      ideas.forEach(idea => {
+        const status = statuses[idea.id]?.status || 'pending';
+        counts[status] = (counts[status] || 0) + 1;
+      });
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        const filter = btn.dataset.filter;
+        const count = counts[filter] || 0;
+        if (filter === 'all') {
+          btn.textContent = `All (${counts.all})`;
+        } else {
+          btn.textContent = `${filter.charAt(0).toUpperCase() + filter.slice(1)} (${count})`;
+        }
+      });
+    }
+
+    function sortIdeas(ideasToSort) {
+      return [...ideasToSort].sort((a, b) => {
+        const scoresA = parseScores(a);
+        const scoresB = parseScores(b);
+        switch (currentSort) {
+          case 'score-desc': return (scoresB.total || 0) - (scoresA.total || 0);
+          case 'score-asc': return (scoresA.total || 0) - (scoresB.total || 0);
+          case 'name-asc': return a.name.localeCompare(b.name);
+          case 'name-desc': return b.name.localeCompare(a.name);
+          case 'recent': return new Date(b.generated_at) - new Date(a.generated_at);
+          default: return 0;
+        }
+      });
+    }
+
+    function filterIdeas(ideasToFilter) {
+      return ideasToFilter.filter(idea => {
+        const status = idea.status || 'pending';
+        const matchesFilter = currentFilter === 'all' || status === currentFilter;
+        const matchesSearch = !searchQuery ||
+          idea.name.toLowerCase().includes(searchQuery) ||
+          (idea.one_liner || '').toLowerCase().includes(searchQuery) ||
+          (idea.target_persona || '').toLowerCase().includes(searchQuery);
+        return matchesFilter && matchesSearch;
+      });
     }
 
     function renderIdeas() {
-      const filtered = ideas.filter(idea => {
-        if (currentFilter === 'all') return true;
-        return (idea.status || 'pending') === currentFilter;
-      });
+      const filtered = filterIdeas(ideas);
+      const sorted = sortIdeas(filtered);
 
       const grid = document.getElementById('ideas-grid');
-      grid.innerHTML = filtered.map(idea => {
+
+      if (sorted.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <h3>No ideas found</h3>
+            <p>Try adjusting your search or filters</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = sorted.map(idea => {
         const status = idea.status || 'pending';
+        const scores = parseScores(idea);
+        const totalScore = scores.total || 0;
+        const scoreClass = getScoreClass(totalScore);
+
         return `
-          <div class="idea-card ${status}" data-id="${idea.id}">
+          <div class="idea-card ${status}" data-id="${idea.id}" onclick="viewDetails('${idea.id}')">
             <div class="idea-header">
               <div>
                 <span class="idea-name">${idea.name}</span>
-                <span class="status-badge status-${status}">${status.toUpperCase()}</span>
+                <span class="status-badge status-${status}">${status}</span>
               </div>
-              <span class="idea-score">${(() => { const s = typeof idea.scores === 'string' ? JSON.parse(idea.scores || '{}') : (idea.scores || {}); return (s.total || 0).toFixed(1); })()}</span>
+              <span class="idea-score ${scoreClass}">${totalScore.toFixed(1)}</span>
             </div>
-            <div class="idea-tagline">${idea.one_liner || idea.tagline || ''}</div>
+            ${idea.cluster_name ? `<div class="idea-cluster">${idea.cluster_name}</div>` : ''}
+            <div class="idea-tagline">${idea.one_liner || ''}</div>
             <div class="idea-persona"><strong>Target:</strong> ${idea.target_persona || 'N/A'}</div>
             <div class="scores-row">
-              ${(() => {
-                const s = typeof idea.scores === 'string' ? JSON.parse(idea.scores || '{}') : (idea.scores || {});
-                return \`
-                  <div class="score-item"><div class="value">\${(s.pain || 0).toFixed(1)}</div><div class="label">Pain</div></div>
-                  <div class="score-item"><div class="value">\${(s.intent || 0).toFixed(1)}</div><div class="label">Intent</div></div>
-                  <div class="score-item"><div class="value">\${(s.frequency || 0).toFixed(1)}</div><div class="label">Freq</div></div>
-                  <div class="score-item"><div class="value">\${(s.total || 0).toFixed(1)}</div><div class="label">Total</div></div>
-                \`;
-              })()}
+              <div class="score-item"><div class="value">${(scores.pain || 0).toFixed(1)}</div><div class="label">Pain</div></div>
+              <div class="score-item"><div class="value">${(scores.intent || 0).toFixed(1)}</div><div class="label">Intent</div></div>
+              <div class="score-item"><div class="value">${(scores.frequency || 0).toFixed(1)}</div><div class="label">Freq</div></div>
+              <div class="score-item"><div class="value">${(scores.buildability || 0).toFixed(1)}</div><div class="label">Build</div></div>
             </div>
-            <div class="idea-actions">
+            <div class="idea-actions" onclick="event.stopPropagation()">
+              <button class="btn btn-shortlist" onclick="updateStatus('${idea.id}', 'shortlisted')">Shortlist</button>
               <button class="btn btn-approve" onclick="updateStatus('${idea.id}', 'approved')">Approve</button>
               <button class="btn btn-reject" onclick="updateStatus('${idea.id}', 'rejected')">Reject</button>
-              <button class="btn btn-view" onclick="viewDetails('${idea.id}')">Details</button>
             </div>
           </div>
         `;
       }).join('');
     }
 
-    // Load saved statuses from localStorage
     function loadLocalStatus() {
       const saved = localStorage.getItem('ideaStatuses');
       return saved ? JSON.parse(saved) : {};
@@ -311,73 +533,135 @@
       localStorage.setItem('ideaStatuses', JSON.stringify(statuses));
     }
 
-    async function updateStatus(id, status) {
+    function updateStatus(id, status) {
       const statuses = loadLocalStatus();
-      statuses[id] = { status, updatedAt: new Date().toISOString() };
+      statuses[id] = { status, updatedAt: new Date().toISOString(), notes: statuses[id]?.notes || '' };
       saveLocalStatus(statuses);
       const idea = ideas.find(i => i.id === id);
       if (idea) idea.status = status;
       renderIdeas();
+      updateFilterCounts();
     }
 
-    async function viewDetails(id) {
+    function viewDetails(id) {
       const idea = ideas.find(i => i.id === id);
       if (!idea) return;
 
-      const features = JSON.parse(idea.mvp_features || '[]');
-      const workflow = JSON.parse(idea.mvp_workflow || '[]');
-      const scores = JSON.parse(idea.scores || '{}');
+      let features = [];
+      let workflow = [];
+      let evidenceSnippets = [];
+
+      try { features = JSON.parse(idea.mvp_features || '[]'); } catch {}
+      try { workflow = JSON.parse(idea.mvp_workflow || '[]'); } catch {}
+      try { evidenceSnippets = JSON.parse(idea.evidence_snippets || '[]'); } catch {}
+
+      const scores = parseScores(idea);
       const statuses = loadLocalStatus();
       const savedData = statuses[id] || {};
+      const status = savedData.status || 'pending';
 
-      document.getElementById('modal-content').innerHTML = \`
+      document.getElementById('modal-content').innerHTML = `
         <div class="modal-header">
-          <h2>\${idea.name}</h2>
+          <div>
+            <h2>${idea.name}</h2>
+            <span class="status-badge status-${status}" style="margin-left: 0; margin-top: 10px;">${status.toUpperCase()}</span>
+          </div>
           <button class="modal-close" onclick="closeModal()">&times;</button>
         </div>
-        <p class="idea-tagline">\${idea.one_liner || idea.tagline || ''}</p>
-        <div class="idea-persona" style="margin: 20px 0;"><strong>Target:</strong> \${idea.target_persona}</div>
 
-        <h3 style="margin: 20px 0 10px; color: #ff4500;">Scores</h3>
-        <div class="scores-row">
-          <div class="score-item"><div class="value">\${(scores.pain || 0).toFixed(1)}</div><div class="label">Pain</div></div>
-          <div class="score-item"><div class="value">\${(scores.intent || 0).toFixed(1)}</div><div class="label">Intent</div></div>
-          <div class="score-item"><div class="value">\${(scores.frequency || 0).toFixed(1)}</div><div class="label">Frequency</div></div>
-          <div class="score-item"><div class="value">\${(scores.buildability || 0).toFixed(1)}</div><div class="label">Buildable</div></div>
+        <p class="idea-tagline" style="font-size: 16px; margin-bottom: 20px;">${idea.one_liner || ''}</p>
+
+        <div class="detail-section">
+          <h3>Target Customer</h3>
+          <p style="color: #ccc;">${idea.target_persona}</p>
         </div>
 
-        <h3 style="margin: 20px 0 10px; color: #ff4500;">MVP Workflow</h3>
-        <ol style="padding-left: 20px; color: #ccc;">
-          \${workflow.map(step => \`<li style="margin: 5px 0;">\${step}</li>\`).join('')}
-        </ol>
+        ${idea.cluster_name ? `
+        <div class="detail-section">
+          <h3>Problem Cluster</h3>
+          <p style="color: #ccc;"><strong>${idea.cluster_name}</strong></p>
+          <p style="color: #888; font-size: 14px;">${idea.cluster_description || ''}</p>
+        </div>
+        ` : ''}
 
-        <h3 style="margin: 20px 0 10px; color: #ff4500;">Must-Have Features</h3>
-        <ul class="feature-list">
-          \${features.map(f => \`<li>\${f}</li>\`).join('')}
-        </ul>
+        <div class="detail-section">
+          <h3>Scores Breakdown</h3>
+          <div class="scores-row" style="max-width: 500px;">
+            <div class="score-item"><div class="value">${(scores.pain || 0).toFixed(1)}</div><div class="label">Pain Level</div></div>
+            <div class="score-item"><div class="value">${(scores.intent || 0).toFixed(1)}</div><div class="label">Buy Intent</div></div>
+            <div class="score-item"><div class="value">${(scores.frequency || 0).toFixed(1)}</div><div class="label">Frequency</div></div>
+            <div class="score-item"><div class="value">${(scores.buildability || 0).toFixed(1)}</div><div class="label">Buildability</div></div>
+            <div class="score-item" style="background: #ff4500;"><div class="value" style="color: white;">${(scores.total || 0).toFixed(1)}</div><div class="label" style="color: rgba(255,255,255,0.8);">Total</div></div>
+          </div>
+        </div>
 
-        <h3 style="margin: 20px 0 10px; color: #ff4500;">Pricing</h3>
-        <p style="color: #22c55e; font-size: 18px; font-weight: bold;">\${idea.pricing_hypothesis || 'TBD'}</p>
+        ${workflow.length > 0 ? `
+        <div class="detail-section">
+          <h3>MVP User Workflow</h3>
+          <ol class="workflow-list">
+            ${workflow.map(step => `<li>${step}</li>`).join('')}
+          </ol>
+        </div>
+        ` : ''}
 
-        <h3 style="margin: 20px 0 10px; color: #ff4500;">Why It Wins</h3>
-        <p style="color: #ccc;">\${idea.why_it_wins || 'N/A'}</p>
+        ${features.length > 0 ? `
+        <div class="detail-section">
+          <h3>Must-Have Features</h3>
+          <ul class="feature-list">
+            ${features.map(f => `<li>${f}</li>`).join('')}
+          </ul>
+        </div>
+        ` : ''}
 
-        <h3 style="margin: 20px 0 10px; color: #ff4500;">Notes</h3>
-        <textarea id="notes-\${id}" rows="4" placeholder="Add your notes here...">\${savedData.notes || ''}</textarea>
-        <button class="btn btn-view" style="margin-top: 10px;" onclick="saveNotes('\${id}')">Save Notes</button>
-      \`;
+        <div class="detail-section">
+          <h3>Pricing Hypothesis</h3>
+          <span class="pricing-tag">${idea.pricing_hypothesis || 'TBD'}</span>
+        </div>
+
+        <div class="detail-section">
+          <h3>Why It Wins</h3>
+          <p style="color: #ccc; line-height: 1.7;">${idea.why_it_wins || 'N/A'}</p>
+        </div>
+
+        ${evidenceSnippets.length > 0 ? `
+        <div class="detail-section">
+          <h3>Evidence from Reddit</h3>
+          ${evidenceSnippets.slice(0, 5).map(snippet => `
+            <div class="evidence-item">
+              <p class="evidence-text">"${snippet}"</p>
+            </div>
+          `).join('')}
+        </div>
+        ` : ''}
+
+        <div class="detail-section">
+          <h3>Your Notes</h3>
+          <textarea id="notes-${id}" rows="4" placeholder="Add your analysis, thoughts, or next steps...">${savedData.notes || ''}</textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-shortlist" onclick="updateStatusAndClose('${id}', 'shortlisted')">Shortlist</button>
+          <button class="btn btn-approve" onclick="updateStatusAndClose('${id}', 'approved')">Approve</button>
+          <button class="btn btn-reject" onclick="updateStatusAndClose('${id}', 'rejected')">Reject</button>
+          <button class="btn btn-view" onclick="saveNotes('${id}')" style="flex: 2;">Save Notes</button>
+        </div>
+      `;
       document.getElementById('modal').classList.add('active');
     }
 
-    async function saveNotes(id) {
-      const notes = document.getElementById(\`notes-\${id}\`).value;
+    function updateStatusAndClose(id, status) {
+      saveNotes(id);
+      updateStatus(id, status);
+      closeModal();
+    }
+
+    function saveNotes(id) {
+      const notes = document.getElementById(`notes-${id}`).value;
       const statuses = loadLocalStatus();
       statuses[id] = { ...statuses[id], notes, updatedAt: new Date().toISOString() };
       saveLocalStatus(statuses);
-      alert('Notes saved locally!');
     }
 
-    // Apply saved statuses to ideas on load
     function applyLocalStatuses() {
       const statuses = loadLocalStatus();
       ideas.forEach(idea => {
@@ -391,6 +675,7 @@
       document.getElementById('modal').classList.remove('active');
     }
 
+    // Event Listeners
     document.querySelectorAll('.filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -400,10 +685,25 @@
       });
     });
 
+    document.getElementById('sort').addEventListener('change', (e) => {
+      currentSort = e.target.value;
+      renderIdeas();
+    });
+
+    document.getElementById('search').addEventListener('input', (e) => {
+      searchQuery = e.target.value.toLowerCase();
+      renderIdeas();
+    });
+
     document.getElementById('modal').addEventListener('click', (e) => {
       if (e.target.id === 'modal') closeModal();
     });
 
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Initialize
     loadStats();
     loadIdeas();
   </script>
