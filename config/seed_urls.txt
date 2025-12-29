@@ -1,0 +1,2 @@
+# Add seed thread URLs here (one per line)
+# Example: https://www.reddit.com/r/sysadmin/comments/abc123/title_here/

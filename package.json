@@ -1,0 +1,53 @@
+{
+  "name": "reddit-idea-miner",
+  "version": "0.1.0",
+  "description": "Mine Reddit for SaaS ideas through structured analysis of pain points and buying intent",
+  "type": "module",
+  "main": "dist/cli.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli.ts",
+    "gen:niches": "tsx src/cli.ts gen:niches",
+    "ingest:subs": "tsx src/cli.ts ingest:subs",
+    "ingest:urls": "tsx src/cli.ts ingest:urls",
+    "analyze": "tsx src/cli.ts analyze",
+    "cluster": "tsx src/cli.ts cluster",
+    "generate": "tsx src/cli.ts generate",
+    "status": "tsx src/cli.ts status",
+    "export": "tsx src/cli.ts export",
+    "smoke-test": "tsx src/cli.ts smoke-test",
+    "test": "vitest",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "reddit",
+    "saas",
+    "ideas",
+    "market-research",
+    "pain-points"
+  ],
+  "author": "Brandon",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.6.0",
+    "commander": "^12.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^5.2.1",
+    "openai": "^4.72.0",
+    "p-queue": "^8.0.1",
+    "playwright": "^1.57.0",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node": "^22.10.2",
+    "eslint": "^9.16.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

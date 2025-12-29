@@ -1,0 +1,27 @@
+{
+  "maxPostsPerSubPerRun": 50,
+  "maxThreadsTotalPerRun": 1000,
+  "requestDelayMs": 1500,
+  "maxCommentsPerThread": 5000,
+  "listingTypes": ["new", "top_month", "top_year"],
+  "priorityKeywords": true,
+  "skipAnalyzed": true,
+  "storeRawJson": false,
+  "analysis": {
+    "minPainScore": 3,
+    "minIntentScore": 3,
+    "maxThreadsToAnalyze": 500,
+    "llmModel": "openai/gpt-4o-mini",
+    "llmMaxTokens": 4096
+  },
+  "clustering": {
+    "minClusters": 3,
+    "maxClusters": 20,
+    "minClusterSize": 2
+  },
+  "reporting": {
+    "topIdeasCount": 20,
+    "minEvidenceUrls": 3,
+    "maxEvidenceSnippets": 8
+  }
+}

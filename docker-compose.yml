@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  reddit-miner:
+    build: .
+    container_name: reddit-idea-miner
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
+      - ./deliverables:/app/deliverables
+    environment:
+      - LLM_API_KEY=${LLM_API_KEY}
+      - LLM_BASE_URL=${LLM_BASE_URL:-https://openrouter.ai/api/v1}
+      - LLM_MODEL=${LLM_MODEL:-openai/gpt-4o-mini}
+      - REDDIT_USERNAME=${REDDIT_USERNAME}
+      - REDDIT_PASSWORD=${REDDIT_PASSWORD}
+      - DB_PATH=/app/data/reddit.db
+      - NODE_ENV=production
+    networks:
+      - sandbox-net
+    # Keep container running for interactive commands
+    stdin_open: true
+    tty: true
+
+  # Dashboard API server
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    container_name: reddit-miner-dashboard
+    ports:
+      - "3200:3000"
+    volumes:
+      - ./data:/app/data:ro
+    environment:
+      - DB_PATH=/app/data/reddit.db
+      - PORT=3000
+    networks:
+      - sandbox-net
+    depends_on:
+      - reddit-miner
+
+networks:
+  sandbox-net:
+    name: services_sandbox-network
+    external: true
